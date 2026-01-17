@@ -1,0 +1,29 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Pobierz kod
+      uses: actions/checkout@v3
+
+    - name: Zainstaluj Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    - name: Zainstaluj zależności
+      run: npm install
+
+    - name: Sprawdź błędy (Lint)
+      run: npm run lint --if-present
+
+    - name: Próba budowania (Build)
+      run: npm run build
