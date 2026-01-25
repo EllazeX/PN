@@ -19,7 +19,7 @@ jobs:
 
   call-docker-build:
     needs: test-lint
-    uses: ./.github/workflows/reusable-build.yml
+    uses: ./.github/workflows/reusable.yml
     with:
       image_name: ghcr.io/ellazex/pn
     secrets: inherit
