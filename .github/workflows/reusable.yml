@@ -1,0 +1,33 @@
+name: Reusable Docker Build
+
+on:
+  workflow_call:
+    inputs:
+      image_name:
+        required: true
+        type: string
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: 📥 Pobierz kod
+        uses: actions/checkout@v3
+
+      - name: 🔑 Zaloguj się do GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🐳 Zbuduj i wyślij obraz
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ${{ inputs.image_name }}:latest
