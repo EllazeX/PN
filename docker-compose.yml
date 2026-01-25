@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  weather-app:
+    build: .
+    container_name: weather-app
+    ports:
+      - "8080:80"
+    restart: always
+    env_file:
+      - .env
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower-updater
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 300
