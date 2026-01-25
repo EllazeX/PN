@@ -7,12 +7,23 @@ services:
     ports:
       - "8080:80"
     restart: always
-    env_file:
-      - .env
 
-  watchtower:
-    image: containrrr/watchtower
-    container_name: watchtower-updater
+  db:
+    image: postgres:15-alpine
+    container_name: weather-db
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: weatherdb
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: --interval 300
+      - db_data:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8081:8080"
+
+volumes:
+  db_data:
