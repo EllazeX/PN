@@ -1,4 +1,4 @@
-name: CI Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
@@ -6,24 +6,38 @@ on:
   pull_request:
     branches: [ "main" ]
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
-  build-test:
+  build-and-push:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Pobierz kod
-      uses: actions/checkout@v3
+      - name: 📥 Pobierz kod
+        uses: actions/checkout@v3
 
-    - name: Zainstaluj Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: 18
+      - name: 🔧 Przygotuj środowisko Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
 
-    - name: Zainstaluj zależności
-      run: npm install
+      - name: 📦 Instalacja zależności
+        run: npm install
 
-    - name: Sprawdź błędy (Lint)
-      run: npm run lint --if-present || true
+      - name: 🔍 Sprawdź błędy (Lint)
+        run: npm run lint --if-present || true
 
-    - name: Próba budowania (Build)
-      run: npm run build
+      - name: 🔑 Zaloguj się do GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🐳 Zbuduj i wyślij obraz (Build & Push)
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/ellazex/pn:latest
